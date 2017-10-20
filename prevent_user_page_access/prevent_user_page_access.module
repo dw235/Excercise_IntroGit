@@ -1,5 +1,7 @@
 <?php 
 
+/** hides the user links **/
+
 function prevent_user_page_access_menu_alter(&$items) {
   $items['user/%user']['access arguments'] = array('access user profiles');
   $items['user/%user']['access callback'] = 'user_access';
