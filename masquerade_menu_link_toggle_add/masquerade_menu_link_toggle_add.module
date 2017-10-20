@@ -1,0 +1,73 @@
+<?php
+
+/**
+* Implements hook_menu().
+*/
+
+function masquerade_menu_link_toggle_add_menu() {
+	
+	global $user;
+
+	$items = '';
+		
+	//dsm($user->uid);
+	//dsm($_SESSION);
+	//dsm(drupal_get_token('masquerade/uswitch'));
+	
+	
+	if (empty($_SESSION['masquerading'])) {
+	
+		$items[''] = array(
+			'title' => 'Masquerade',
+			'page callback' => 'helloworld_page',
+			//'access callback' => TRUE,
+			'access arguments' => array('access user profiles'),
+			'menu_name' => 'user-menu',  // This is the changed line.
+			'options' => array(
+				'fragment' => 'masq',
+				'attributes' => array(    // Add attributes to work the toggle.
+					'id' => array('menu-masq-toggle-link'),
+					'data-toggle' => array('collapse'),
+					'aria-expanded' => array('false'),
+					'aria-controls' => array('masq'),
+				),
+			), // add #masq
+			
+		);
+	
+	} /*else {
+	
+		$items[''] = array(
+			'title' => 'Switch Back',
+			'page callback' => 'helloworld_page',
+			'access callback' => TRUE,
+			//'access arguments' => array('access administration pages'),
+			'menu_name' => 'user-menu',  // This is the changed line.
+			'options' => array(
+				'fragment' => 'masq',
+				'attributes' => array(    // Add attributes to work the toggle.
+					'id' => array('menu-masq-toggle-back-link'),
+					'data-toggle' => array('collapse'),
+					'aria-expanded' => array('false'),
+					'aria-controls' => array('masq'),
+				),
+			), // add #masq 
+			
+		);
+	
+	}*/
+
+	
+	return $items;
+}
+
+/**
+ * Page callback for /hello.
+ */
+function helloworld_page() {
+	
+	$html = '<p>Masquerade link requires Javascript enabled on your browser to work properly.</p>';
+	
+	return $html; // place holder message
+	
+}

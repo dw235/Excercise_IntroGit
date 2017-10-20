@@ -1,0 +1,5 @@
+name = OVC Masquerade Menu Link Toggle Add
+description = Add a link to the main menu for toggling the Bootstrap Collapse of the Masquerade block.
+package = OVC Custom Modules
+core = 7.x
+version = "7.x-1.0"

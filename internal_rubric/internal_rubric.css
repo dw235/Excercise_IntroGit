@@ -1,0 +1,352 @@
+/* Rubric Criteria styling */
+
+body {
+	 font-size: 1.2em;
+}
+
+.navbar-brand {
+	 font-size: 1.333em;
+}
+
+h1, .h1 {
+	 font-size: 2.667em;
+}
+
+h2, .h2 {
+	 font-size: 2.333em;
+}
+
+.tooltip-inner {
+	 max-width: 350px;
+}
+
+div.page-divide {
+	 border-bottom: 1px solid #d8d8d8;
+	 margin: 3em 0;
+	 page-break-after: always;
+}
+
+/* Rubric Information and Summary styling */
+
+.rubric-info p {
+	 font-size: 2em;
+	 margin-left: 0.25em;
+}
+.rubric-info h3 {
+	 font-size: 1em;
+	 font-weight: bold;
+}
+
+/* Rubric Section Header styling */
+
+header.rubric-section {
+	 background-color: #16365D;
+	 color: #FFF;
+}
+header.rubric-section.row,
+div.criteria.row {
+	 margin-right: 0;
+	 margin-left: 0;
+}
+header.rubric-section div.section-info {
+	 padding-left: 1.5em;
+	 padding-right: 1.5em;
+}
+header.rubric-section div.score {
+	 background-color: #CCFFCC;
+	 color: #000;
+	 text-align: center;
+}
+header.rubric-section div.score h3 {
+	 font-size: 0.857em;
+	 border-bottom: 1px #000 solid;
+	 padding-bottom: 8px;
+}
+header.rubric-section div.score p {
+	 font-size: 1.714em;
+}
+
+/* Rubric Criteria styling */
+
+.highlight {
+	 background-color: #d9d0e3;
+}
+
+.criteria {
+	 border-top: 1px solid #D8D8D8;
+}
+.criteria.last {
+	 border-bottom: 1px solid #D8D8D8;
+}
+
+.criteria h3.visible-xs {
+	 font-size: 1.286em;
+	 margin: 0;
+	 padding: 15px 15px 8px;
+	 border-bottom: 1px solid #212121;
+	 }
+
+h4.level {
+	 font-size: 1.071em;
+	 font-weight: normal;
+	 margin: 0;
+	 text-align: left;
+	 padding: 1.5em 0 0.75em 0;
+	 }
+h4.level span {
+	 font-weight: bold;
+	 }
+
+.criterion {
+	 border-left:   1px solid #D8D8D8;
+	 border-bottom: 1px solid #D8D8D8;
+	 border-right: none;
+	 padding: 0 15px 1.5em;
+	 }
+
+.criterion.last {
+	 border-right: 1px solid #D8D8D8;
+	 }
+
+h4.level {
+	 background-color: #cadcf2;
+	 margin-bottom: 1.5em;
+	 text-align: center;
+	 padding-left: 1.5em;
+	 padding-right: 1.5em;
+	 padding-bottom: 1.5em;
+	 margin: 0 -1.5em;
+	 }
+.criterion {
+	 border-bottom: none;
+	 padding: 0 1.5em 1.5em;
+	 }
+.criterion .descriptor {
+	 margin-top: 1.5em;
+}
+
+
+.criteria .criterion.selected {
+	 background-color: #dff0d7;
+	 }
+
+/* hidden - this css gives a font awesome check box instead of the number values
+
+.criteria .criterion.selected:before {
+	 position:absolute;
+	 color: #FFF;
+	 font-family: FontAwesome;
+	 font-size: 2.5em;
+	 bottom:0.343em;
+	 right: 0.686em;
+	 content: "";
+	 text-shadow: 1px 1px 3px #3e6c29;
+	 }*/
+
+.criteria .criterion.selected:before {
+	 position:absolute;
+	 color: #FFF;
+	 font-size: 1.5em;
+	 bottom:0.343em;
+	 right: 0.686em;
+	 content: "-";
+	 text-shadow: 1px 1px 3px #000;
+	 background: #838d7e;
+	 border-radius: 50%;
+	 width: 34px;
+	 height: 34px;
+	 text-align: center;
+	 border: 2px solid #FFF;
+}
+
+.criteria .criterion.one.selected:before {
+	 content: "3";
+}
+.criteria .criterion.two.selected:before {
+	 content: "2";
+}
+.criteria .criterion.three.selected:before {
+	 content: "1";
+}
+.criteria .criterion.four.selected:before {
+	 content: "0";
+}
+
+.criteria .criterion.selected .highlight {
+	 background-color: #fcf8e2;
+}
+
+.criterion-label {
+	 padding-top: 2em;
+	 border: 1px solid #D8D8D8;
+	 background-color: #fdfce8;
+}
+
+/* Striping for tables modification */
+
+.table-striped > tbody > tr:nth-child(2n) > td,
+.table-striped > tbody > tr:nth-child(2n+1) > th {
+	 background-color: #fff;
+}
+
+.table-striped > tbody > tr:nth-child(2n+1) > td,
+.table-striped > tbody > tr:nth-child(2n+1) > th {
+	 background-color: #f9f9f9;
+}
+
+/* Striping for 'Success' */
+
+.table > tbody > tr > td.success,
+.table > tbody > tr > th.success,
+.table > tbody > tr.success > td,
+.table > tbody > tr.success > th {
+	 background-color: none;
+}
+
+.table-striped > tbody > tr.success:nth-child(2n+1) > td,
+.table-striped > tbody > tr.success:nth-child(2n+1) > th {
+	 background-color: #cfebc3;
+}
+
+.table-striped > tbody > tr.success:nth-child(2n) > td,
+.table-striped > tbody > tr.success:nth-child(2n+1) > th {
+	 background-color: #dff0d8;
+}
+
+/* Striping for 'Warning' */
+
+.table > tbody > tr > td.warning,
+.table > tbody > tr > th.warning,
+.table > tbody > tr.warning > td,
+.table > tbody > tr.warning > th {
+	 background-color: none;
+}
+
+.table-striped > tbody > tr.warning:nth-child(2n+1) > td,
+.table-striped > tbody > tr.warning:nth-child(2n+1) > th {
+	 background-color: #fbf3cb;
+}
+
+.table-striped > tbody > tr.warning:nth-child(2n) > td,
+.table-striped > tbody > tr.warning:nth-child(2n+1) > th {
+	 background-color: #fcf8e3;
+}
+
+/* Striping for 'Danger' */
+
+.table > tbody > tr > td.danger,
+.table > tbody > tr > th.danger,
+.table > tbody > tr.danger > td,
+.table > tbody > tr.danger > th {
+	 background-color: none;
+}
+
+.table-striped > tbody > tr.danger:nth-child(2n+1) > td,
+.table-striped > tbody > tr.danger:nth-child(2n+1) > th {
+	 background-color: #edcaca;
+}
+
+.table-striped > tbody > tr.danger:nth-child(2n) > td,
+.table-striped > tbody > tr.danger:nth-child(2n+1) > th {
+	 background-color: #f2dede;
+}
+
+/* Rubric Information and Summary styling */
+
+.rubric-info p {
+	 font-size: 2em;
+	 margin-left: 0.25em;
+}
+.rubric-info p.comments {
+	 font-size: 1.2em;
+	 margin-left: 0.25em;
+}
+.rubric-info h3 {
+	 font-size: 1em;
+	 font-weight: bold;
+}
+
+/* Rubric Section Header styling */
+
+header.rubric-section {
+	 background-color: #16365D;
+	 color: #FFF;
+}
+header.rubric-section div.section-info {
+	 padding: 1.5em;
+}
+header.rubric-section div.score {
+	 background-color: #CCFFCC;
+	 color: #000;
+	 text-align: center;
+}
+header.rubric-section div.score h3 {
+	 font-size: 0.857em;
+	 border-bottom: 1px #000 solid;
+	 padding-bottom: 8px;
+}
+header.rubric-section div.score p {
+	 font-size: 1.714em;
+}
+header.rubric-section div.score div.score-sm {
+	 font-size: 0.929em;
+	 text-align: left;
+	 margin: 1.5em 0;
+}
+header.rubric-section div.score div.score-sm span {
+	 font-weight: bold;
+
+}
+@media (min-width: 768px) { 
+	 header.rubric-section div.score div.score-sm span {
+		  display:block;
+		  width: 50px;
+		  text-align: center;
+		  float: right;
+	 }
+}
+
+header.rubric-section div.score div.score-sm ul {
+	 list-style: none;
+	 padding-left: 8px;
+}
+
+header.rubric-section div.score div.score-sm ul li {
+	 margin-bottom: 0.25em;
+}
+
+@media print {
+	 .criterion.selected {
+		  background-color: #dff0d7 !important;
+		  -webkit-print-color-adjust: exact;
+	 }
+	 .criterion .descriptor {
+		  font-size: 9px;
+		  overflow: hidden;
+	 }
+	 .criterion-label {
+		  background-color: #FDFCE8 !important;
+		  -webkit-print-color-adjust: exact;
+	 }
+	 div.score {
+		  background-color: #CFC !important;
+		  -webkit-print-color-adjust: exact;
+	 }
+	 h4.level {
+		  background-color: #cadcf2 !important;
+		  font-size: 11px;
+		  -webkit-print-color-adjust: exact;
+	 }
+}
+
+.alpha-list-item {
+	 float: left;
+}
+
+/* Centered Pills */
+.centered-pills { text-align:center; }
+.centered-pills ul.nav-pills { display:inline-block; }
+.centered-pills li { display:inline; }
+.centered-pills a { float:left; }
+* html .centered-pills ul.nav-pills { display:inline; } /* IE6 */
+*+html .centered-pills ul.nav-pills { display:inline; } /* IE7 */

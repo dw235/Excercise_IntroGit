@@ -1,0 +1,202 @@
+<?php 
+
+/**
+ * Implements hook_init().
+ * 
+ * Loading external rubric style sheets.
+ * 
+ */
+function external_rubric_init() {
+  drupal_add_css(drupal_get_path('module', 'external_rubric') . '/external_rubric.css');
+}
+
+/**
+ * Implements hook_preprocess_page().
+ * 
+ * This sets a theme hook suggestion which allows the use of
+ * views-view--schedules--schedule-block.tpl.php as template
+ * file.
+ * 
+ */
+
+function external_rubric_preprocess_page(&$vars) {
+
+  if (($views_page = views_get_page_view()) && $views_page->name === "rubric_evaluation_view_external_v2_") {
+    $vars['theme_hook_suggestions'][] = 'page__view__evaluation_external_v2_';
+  }
+}
+
+function get_criteria_score($descriptor,$criteria_score) {
+  
+  $checked = '<div class="criterion selected col-xs-6">';
+  $checked .= '<div class="descriptor selected" style="text-align:center; font-size: 1.5em;"><p><i class="fa fa-check"></i></p></div>';
+  $unchecked = '<div class="criterion col-xs-6">';
+  $unchecked .= '<div class="descriptor" style="text-align:center; font-size: 1.5em;"><p>&nbsp;</p></div>';
+  
+  $html = '<div class="criteria row">';
+  $html .= '  <div class="col-xs-2 criterion-label"><p>'.$descriptor.'</p></div>';
+  $html .= '  <div class="col-xs-5">';
+  $html .= '  <div class="row">';
+    if ($criteria_score == 4) { $html .= $checked; } else { $html .= $unchecked; } // level 4
+  $html .= '    </div>';
+    if ($criteria_score == 3) { $html .= $checked; } else { $html .= $unchecked; } // level 3
+  $html .= '</div></div></div>';
+  $html .= '<div class="col-xs-5">';
+  $html .= '<div class="row">';
+    if ($criteria_score == 2) { $html .= $checked; } else { $html .= $unchecked; } // level 2
+  $html .= '</div>';
+    if ($criteria_score == 1) { $html .= $checked; } else { $html .= $unchecked; } // level 1
+  $html .= '</div></div></div></div>';
+  
+  return $html;
+}
+
+function external_rubric_views_pre_render(&$view) {
+  
+  global $user;
+  $uglogin = $user->name;
+
+  if (isset($view->name) && $view->name == 'rubric_evaluation_view_external_v2_') {
+    
+    $level_html = '<div class="row levels">';
+    $level_html .= '  <div class="col-xs-2">';
+    $level_html .= '  </div>';
+    $level_html .= '  <div class="col-xs-5">';
+    $level_html .= '    <div class="row">';
+    $level_html .= '      <div class="col-xs-6 level">';
+    $level_html .= '        <h4><span>Beyond the level of a new veterinarian</span></h4>';
+    $level_html .= '      </div>';
+    $level_html .= '      <div class="col-xs-6 level">';
+    $level_html .= '        <h4><span>At the level of a new veterinarian</span></h4>';
+    $level_html .= '      </div>';
+    $level_html .= '    </div>';
+    $level_html .= '  </div>';
+    $level_html .= '  <div class="col-xs-5">';
+    $level_html .= '    <div class="row">';
+    $level_html .= '      <div class="col-xs-6 level">';
+    $level_html .= '        <h4><span>Needs minor improvement</span></h4>';
+    $level_html .= '      </div>';
+    $level_html .= '      <div class="col-xs-6 level">';
+    $level_html .= '        <h4><span>Needs significant improvement</span></h4>';
+    $level_html .= '      </div>';
+    $level_html .= '    </div>';
+    $level_html .= '  </div>';
+    $level_html .= '</div>';
+    
+    $evaluation = $view->result[0];
+    
+    // Build Title
+    $page_title = $evaluation->rq_ext2_location.' | '.$evaluation->rq_ext2_week_label.' | '.$evaluation->rdata_students_rq_ext2_fname.' '.$evaluation->rdata_students_rq_ext2_lname;
+    // Set Title
+    $view->build_info['title'] = $page_title;
+    // Build Breadcrumbs
+    $breadcrumb = array();
+    $breadcrumb[] = l('Home', '<front>');
+    $breadcrumb[] = l($evaluation->rdata_students_rq_ext2_fname.' '.$evaluation->rdata_students_rq_ext2_lname.' ('.$evaluation->rq_ext2_central_id.')', 'e/'.$evaluation->rq_ext2_central_id);
+    $breadcrumb[] = $evaluation->rq_ext2_location.' | '.$evaluation->rq_ext2_week_label;
+    // Set Breadcrumbs
+    drupal_set_breadcrumb($breadcrumb);
+
+
+    if ($evaluation->rq_ext2_veterinarian == '') {
+      $veterinarian = '--';
+    } else {
+      $veterinarian = $evaluation->rq_ext2_veterinarian;
+    }
+    
+    $html = '<div class="row"><div class="col-xs-8">';
+    $html .= '  <h2 class="ext">External Experience</h2>';
+    $html .= '  <div class="experience">'.$evaluation->rq_ext2_location.'</div>';
+    $html .= '</div><div class="col-xs-4">';
+    $html .= '  <h3 class="ext">Week</h3>';
+    $html .= '  <div class="week">'.str_replace('_','/',$evaluation->rq_ext2_week_label).'</div>';
+    $html .= '</div></div>';
+    
+    $html .= '<div class="row"><div class="col-xs-4">';
+    $html .= '  <h3 class="ext">Supervisor</h3>';
+    $html .= '  <div class="supervisor">'.$evaluation->rq_ext2_supervisor.'</div>';
+    $html .= '</div><div class="col-xs-4">';
+    $html .= '  <h3 class="ext">Veterinarian</h3>';
+    $html .= '  <div class="veterinarian">'.$veterinarian.'</div>';
+    $html .= '</div><div class="col-xs-4">';
+    $html .= '  <h3 class="ext">Evaluation Date</h3>';
+
+    if ($evaluation->rq_ext2_form_date != 0){
+
+      $html .= '  <div class="date">'.date("M d, Y",$evaluation->rq_ext2_form_date).'</div>';
+
+    } else {
+
+      $html .= '  <div class="date"><em>unknown</em></div>';
+
+    }
+
+    $html .= '</div></div>';
+    
+    $html .= '<div class="row"><div class="col-xs-4">';
+    $html .= '  <h3 class="ext">Overall grade</h3>';
+    $html .= '  <div class="grade">'.$evaluation->rq_ext2_grade.'</div>';
+    $html .= '</div><div class="col-xs-8">';
+    $html .= '  <h4 class="ext">Comments</h4>';
+
+    if ($evaluation->rq_ext2_share_comments == 0) {
+      $html .= '  <div class="comments"><em>No comments available.<em></div>';
+    } else {
+      $html .= '  <div class="comments">'.$evaluation->rq_ext2_comments.'</div>';
+    }
+    $html .= '</div></div>';
+    
+    if ($evaluation->rq_ext2_experience_type == 'External Rotation') {
+
+      $html .= $level_html;
+      
+      //  Basic Knowledge
+      
+      $criteria_score = $evaluation->rq_ext2_cat_basic_knowledge;
+      $html .= get_criteria_score('Basic Knowledge',$criteria_score);
+      
+      //  Applied Knowledge
+      
+      $criteria_score = $evaluation->rq_ext2_cat_applied_knowledge;
+      $html .= get_criteria_score('Applied Knowledge',$criteria_score);
+      
+      //  Technical Skills
+      
+      $criteria_score = $evaluation->rq_ext2_cat_technical;
+      $html .= get_criteria_score('Technical Skills',$criteria_score);
+      
+      //  Attitude
+      
+      $criteria_score = $evaluation->rq_ext2_cat_attitude;
+      $html .= get_criteria_score('Attitude',$criteria_score);
+      
+      //  Ability to Relate to Staff & Clients
+      
+      $criteria_score = $evaluation->rq_ext2_cat_relationship;
+      $html .= get_criteria_score('Ability to Relate to Staff &amp; Clients',$criteria_score);
+      
+      //  Professionalism
+      
+      $criteria_score = $evaluation->rq_ext2_cat_professionalism;
+      $html .= get_criteria_score('Professionalism',$criteria_score);
+    
+    }
+    
+    $html .= '<hr>';
+    
+    $header_options = array(
+      'label' => t('Header text'), // Administrative label. Not really needed here.
+      'content' => $html, // Content of header text.
+      'format' => 'full_html', // Format of header text.
+      'empty' => 1, // Show even when there are no results. Set to zero otherwise.
+    );
+    $view->add_item('default', 'header', 'views', 'area', $header_options);
+
+    
+    //kpr($view->result);
+  
+  }
+  
+  
+
+}

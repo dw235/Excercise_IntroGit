@@ -1,0 +1,66 @@
+<?php 
+
+
+function exception_reports_getExtAssessments($tfid,$uglogin) {
+
+  // Query Internal Assessments:
+
+  $query = db_select('rq_ext','r')
+    ->fields('r', array('student_login','weeks','evalue_tfid','qualtrics_response_id','grade'))
+    ->condition('student_login',$uglogin)
+    ->condition('evalue_tfid',$tfid)
+    ->execute();
+  $data = $query->fetchall();
+
+  return $data;
+
+  // End Query of External Assessments <<
+}
+
+function exception_reports_views_pre_render(&$view) {
+
+  switch ($view->name) {
+    case 'exception_report':  // Exception Report
+
+      kpr($view);
+
+      foreach($view->result as $key => $r) {
+
+        $ev_activityid = $r->rdata_schedules_all_evalue_activityid;
+        $location = $r->rdata_sites_all_evalue_location;
+
+        if ($ev_activityid == '100861') { // Externship Activity ID(100861)
+
+          unset($view->result[$key]);
+
+        } else {
+
+          $ev_timeframeid = $r->rdata_schedules_all_evalue_timeframeid;
+          $uglogin = $r->rdata_students_central_id;
+
+          $result_ext = exception_reports_getExtAssessments($ev_timeframeid,$uglogin);
+
+          /*if($key != 0) {
+            if ($r->rdata_sites_all_evalue_location != '*OVC' && $r->rdata_sites_all_evalue_location == $view->result[$key-1]->rdata_sites_all_evalue_location) {
+              $r->rdata_timeframes_all_evalue_label = $view->result[$key-1]->rdata_timeframes_all_evalue_label . '/' . substr($r->rdata_timeframes_all_evalue_label,1);
+              $r->rdata_schedules_all_evalue_startdate = $view->result[$key-1]->rdata_schedules_all_evalue_startdate;
+              unset($view->result[$key-1]);
+            }
+          }*/
+
+
+          if (!empty($result_ext)) {
+            kpr($result_ext);
+
+            //unset($view->result[$key]);
+
+          }
+
+          //kpr($ev_timeframeid.'/'.$ev_activityid.'/'.$uglogin);
+
+        }
+      }
+
+    break;
+  }
+}

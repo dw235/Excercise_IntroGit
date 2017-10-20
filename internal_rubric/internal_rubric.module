@@ -1,0 +1,423 @@
+<?php
+
+function getIntEval($rid) {
+
+  // Query Internal Assessments:
+
+  $query = db_select('rq_int2','r')
+    ->fields('r', array())
+    ->condition('qualtrics_respose_id',$rid)
+    ->execute();
+  $data = $query->fetchall();
+  
+  // Query the schedule table using User ID and Timeframe ID to retreive the Activity ID.
+  
+  $uid = $data[0]->evalue_id;
+  $tfid = $data[0]->evalue_timeframe_id;
+  
+  $query = db_select('rdata_schedules_all_evalue','r')
+    ->fields('r', array('activityid'))
+    ->condition('userid',$uid)
+    ->condition('timeframeid',$tfid)
+    ->execute();
+  $sched = $query->fetchall();
+  
+  $aid = $sched[0]->activityid;
+  
+  // Query the HMR table using Activity ID to determine those that are Health Management Rotations.
+
+  $query = db_select('rdata_hmr','r')
+    ->fields('r', array('rotationName', 'evalue_activity_id'))
+    ->condition('evalue_activity_id',$aid)
+    ->execute();
+  $hmr = $query->fetchall();
+
+  if (count($hmr) > 0) {
+    foreach($data as $key => $d) {
+      if ($d->percent >= 90){
+        $data[$key]->percent = 'Outstanding';
+      } elseif ($d->percent < 50) {
+        $data[$key]->percent = 'Fail';
+      } else {
+        $data[$key]->percent = 'Complete';
+      } 
+    }
+  }
+  
+  return $data[0];
+
+} // end getIntEval
+
+
+function getStudent($evalue_id){
+
+  // Query Student Data Table:
+
+  $query = db_select('rdata_students','r')
+    ->fields('r', array())
+    ->condition('evalue_id',$evalue_id)
+    ->execute();
+  $data = $query->fetchall();
+
+  return $data[0];
+
+  // End Query of Internal <<
+}
+
+function getTimeframe($timeframe_id){
+
+  // Query Student Data Table:
+
+  $query = db_select('rdata_timeframes_all_evalue','r')
+    ->fields('r', array())
+    ->condition('timeframeid',$timeframe_id)
+    ->execute();
+  $data = $query->fetchall();
+
+  return $data[0];
+
+  // End Query of Internal <<
+}
+
+function getInternalRubricHeader($rubric,$sched_info,$student) {
+
+  $student_evalue_id = $rubric->evalue_id;
+  
+  $html = '';
+
+  $rubric_header_html = '<header class="row">';
+  $rubric_header_html .= '  <div class="col-lg-10 col-lg-offset-1">';
+  $rubric_header_html .= '    <div class="rubric-info">';
+  $rubric_header_html .= '      <div class="row">';
+  $rubric_header_html .= '        <div class="col-xs-12">';
+  $rubric_header_html .= '          <h3>Rotation Name:</h3>';
+  $rubric_header_html .= '          <p>'.$rubric->rotation.'</p>';
+  $rubric_header_html .= '          <h3>Report Type:</h3>';
+  $rubric_header_html .= '          <p class="numeric">'.$rubric->report.'</p>';
+  $rubric_header_html .= '          <h3>Instructor(s):</h3>';
+  $rubric_header_html .= '          <p>'.$rubric->instructors.'</p>';
+  $rubric_header_html .= '        </div>';
+  $rubric_header_html .= '      </div>';
+  $rubric_header_html .= '      <div class="row page-header">';
+  $rubric_header_html .= '        <div class="col-xs-12">';
+  $rubric_header_html .= '          <div class="row">';
+  $rubric_header_html .= '            <div class="col-xs-4">';
+  $rubric_header_html .= '              <h3>Rotation Week(s):</h3>';
+  $rubric_header_html .= '              <p class="numeric">'.$sched_info->full_label.'</p>';
+  $rubric_header_html .= '            </div>';
+  $rubric_header_html .= '          </div>';
+  $rubric_header_html .= '        </div>';
+  $rubric_header_html .= '          <div class="col-xs-12">';
+  $rubric_header_html .= '             <h3>General Comments:</h3>';
+  $rubric_header_html .= '             <p class="comments">'.$rubric->general_comments.'</p>';
+  $rubric_header_html .= '          </div>';
+  $rubric_header_html .= '      </div>';
+
+  if ($rubric->published == 1) {
+
+    $rubric_header_html .= '      <div class="row">';
+    
+    if ($rubric->rotation == 'Cardiology') {
+      
+      $evalscore = $rubric->percent - round($rubric->quiz_score);
+      $eval_wt = 100 - $rubric->quiz_wt;
+      
+      $rubric_header_html .= '        <div class="col-xs-2">';
+      $rubric_header_html .= '          <h3>Quiz Score:</h3>';
+      $rubric_header_html .= '          <p>'.round($rubric->quiz_score).' / '.$rubric->quiz_wt.'</p>';
+      $rubric_header_html .= '        </div>';
+      $rubric_header_html .= '        <div class="col-xs-2">';
+      $rubric_header_html .= '          <h3>Evaluation Score:</h3>';
+      $rubric_header_html .= '          <p>'.$evalscore.' / '.$eval_wt.'</p>';
+      $rubric_header_html .= '        </div>';
+    }
+    
+    kpr($rubric);
+    
+    $rubric_header_html .= '        <div class="col-xs-4">';
+    $rubric_header_html .= '          <h3>Rotation Grade:</h3>';
+    $rubric_header_html .= '          <p>';
+   
+    if (isset($rubric->percent)) {
+
+      $rubric_header_html .= $rubric->percent;
+
+    }
+
+    $rubric_header_html .= '</p>';
+
+    $rubric_header_html .= '        </div>';
+    $rubric_header_html .= '      </div>';
+
+  }
+
+  $rubric_header_html .= '    </div>';
+  $rubric_header_html .= '  </div>';
+  $rubric_header_html .= '</header>';
+
+  $level_html = '<div class="row" style="margin: 0 7px; padding: 0;">';
+  $level_html .= '  <div class="col-xs-5">';
+  $level_html .= '    <div class="row">';
+  $level_html .= '      <div class="col-xs-6">';
+  $level_html .= '        <h4 class="level"><span>Exceeds</span> graduating entry-level expectations</h4>';
+  $level_html .= '      </div>';
+  $level_html .= '      <div class="col-xs-6">';
+  $level_html .= '        <h4 class="level"><span>Meets</span> graduating entry-level expectations</h4>';
+  $level_html .= '      </div>';
+  $level_html .= '    </div>';
+  $level_html .= '  </div>';
+  $level_html .= '  <div class="col-xs-5">';
+  $level_html .= '    <div class="row">';
+  $level_html .= '      <div class="col-xs-6">';
+  $level_html .= '        <h4 class="level"><span>Approaching</span> graduating entry-level expectations</h4>';
+  $level_html .= '      </div>';
+  $level_html .= '      <div class="col-xs-6">';
+  $level_html .= '        <h4 class="level"><span>Significant improvement needed</span> to meet graduating entry-level expectations</h4>';
+  $level_html .= '      </div>';
+  $level_html .= '    </div>';
+  $level_html .= '  </div>';
+  $level_html .= '  <div class="col-xs-2">';
+  $level_html .= '        <h4 class="level">Sub-skill is <span>not applicable</span></h4>';
+  $level_html .= '  </div>';
+  $level_html .= '</div>';
+
+
+  $vidcriteria = taxonomy_vocabulary_machine_name_load('rubric_criteria')->vid;
+  
+  //kpr($vidcriteria);
+  
+  $taxonomy_query = new EntityFieldQuery;
+  $taxonomy_query->entityCondition('entity_type', 'taxonomy_term')
+    ->propertyCondition('vid', $vidcriteria)
+    ->propertyOrderBy('weight');
+    
+  $tax_criteria_terms = $taxonomy_query->execute();
+  
+  //kpr($tax_criteria_terms);
+
+  $category_tid = -1;
+  
+  foreach ($tax_criteria_terms['taxonomy_term'] as $tid => $term) {
+  
+    $criteria_score = 0;
+    $criteria = taxonomy_term_load($tid);
+    
+    if ($criteria->field_rotation_rubric_field_name != NULL){
+      
+      if ($rubric->{$criteria->field_qualtrics_identifier['und'][0]['value']} != 0) { // if criteria is used (eg. vfk01 != 0)
+
+        if ($category_tid != $criteria->field_category['und'][0]['tid']) {
+          
+          if ($category_tid != -1) {
+            if (!empty($rubric->{$abbreviation."_comments"})) {
+              $html .= '<div class="row" style="margin: 0;">';
+              $html .= '  <div class="criterion criterion-label col-xs-12">';
+              $html .= '     <h4>Additional comments:</h4>';
+              $html .= '   <p>'.$rubric->{$abbreviation."_comments"}.'</p>';
+              $html .= '  </div>';
+              $html .= '</div>';
+            }
+          }
+          
+          $category_tid = $criteria->field_category['und'][0]['tid'];
+          $abbreviation = taxonomy_term_load($category_tid)->field_abbreviation['und'][0]['value'];
+          
+          //kpr(taxonomy_term_load($category_tid)->field_abbreviation['und'][0]['value']);
+          
+          //kpr(taxonomy_term_load($category_tid)->description);
+          //kpr($rubric->{$abbreviation."_gr"});
+          
+          //$html .= '<div><h2>'.taxonomy_term_load($category_tid)->name.'</h2><p>'.taxonomy_term_load($category_tid)->description.'</p></div>';
+          
+          $html .= '<div class="page-divide"></div>';
+          
+          $html .= '<header class="row rubric-section">';
+          $html .= '  <div class="col-xs-9 section-info">';
+          $html .= '    <h2>'.taxonomy_term_load($category_tid)->name.'</h2>';
+          $html .= '    <p>'.taxonomy_term_load($category_tid)->description.'</p>';
+          $html .= '  </div>';
+          $html .= '  <div class="col-xs-3 score">';
+          $html .= '    <div class="row visible-md visible-lg">';
+          $html .= '      <div class="col-xs-4 pull-down">';
+          $html .= '        <h3>Section Grade</h3>';
+          $html .= '      </div>';
+          $html .= '      <div class="col-xs-4 pull-down">';
+          $html .= '        <h3>% of<br> Final</h3>';
+          $html .= '      </div>';
+          $html .= '      <div class="col-xs-4 pull-down">';
+          $html .= '        <h3>Marks Awarded</h3>';
+          $html .= '      </div>';
+          $html .= '    </div>';
+          $html .= '    <div class="row visible-md visible-lg">';
+          $html .= '      <div class="col-xs-4">';
+          $html .= '        <p>'.$rubric->{$abbreviation."_gr"}.'/'.$rubric->{$abbreviation."_max"}.'<p>';
+          $html .= '      </div>';
+          $html .= '      <div class="col-xs-4">';
+          $html .= '        <p>'.$rubric->{$abbreviation."_per"}.'%</p>';
+          $html .= '      </div>';
+          $html .= '      <div class="col-xs-4">';
+          $html .= '        <p>'.round($rubric->{$abbreviation."_mk"}, 1).'</p>';
+          $html .= '      </div>';
+          $html .= '    </div>';
+          $html .= '  </div>';
+          $html .= '  <div class="row visible-xs visible-sm">';
+          $html .= '    <div class="col-xs-12 score-sm">';
+          $html .= '      <ul>';
+          $html .= '        <li>Section Grade: <span>'.$rubric->{$abbreviation."_gr"}.'/'.$rubric->{$abbreviation."_max"}.'</span></li>';
+          $html .= '        <li>% of Final: <span>'.$rubric->{$abbreviation."_per"}.'%</span></li>';
+          $html .= '        <li>Marks Awarded: <span>'.round($rubric->{$abbreviation."_mk"}, 1).'</span></li>';
+          $html .= '      </ul>';
+          $html .= '    </div>';
+          $html .= '  </div>';
+          $html .= '</header>';
+          
+          $html .= $level_html;
+          
+        }
+        
+        if(isset($criteria->field_rotation_rubric_field_name['und'][0]['value'])) {
+          $criteria_field_name = $criteria->field_rotation_rubric_field_name['und'][0]['value'];
+          //print($criteria_field_name);
+          $criteria_score = $rubric->{$criteria->field_qualtrics_identifier['und'][0]['value']};
+          //kpr($criteria_score);
+        }
+        
+        $html .= '<div class="row" style="margin: 0;"><div class="criterion criterion-label col-xs-12 last"><p>'.$criteria->name.'</p></div></div>';
+        $html .= '<div class="criteria row">';
+        $html .= '<div class="col-xs-5">';
+        $html .= '<div class="row">';
+        $html .= '<div class="criterion col-xs-6';
+        if ($criteria_score == 1) { $html .= " one selected"; }
+        $html .= '">';
+        
+        if(isset($criteria->field_exceeds['und'][0]['value'])) {
+          $html .= '<div class="descriptor"><p>'.$criteria->field_exceeds['und'][0]['value'].'</p></div>';
+        } else {
+          
+        }
+        
+        $html .= '</div>';
+        $html .= '<div class="criterion col-xs-6';
+        if ($criteria_score == 2) { $html .= " two selected"; }
+        $html .= '">';
+        
+        if(isset($criteria->field_meets['und'][0]['value'])) {
+          $html .= '<div class="descriptor"><p>'.$criteria->field_meets['und'][0]['value'].'</p></div>';
+        } else {
+          
+        }
+        
+        $html .= '</div></div></div>';
+        $html .= '<div class="col-xs-5">';
+        $html .= '<div class="row">';
+        $html .= '<div class="criterion col-xs-6';
+        if ($criteria_score == 3) { $html .= " three selected"; }
+        $html .= '">';
+        
+        if(isset($criteria->field_approaching['und'][0]['value'])) {
+          $html .= '<div class="descriptor"><p>'.$criteria->field_approaching['und'][0]['value'].'</p></div>';
+        } else {
+          
+        }
+        
+        $html .= '</div>';
+        $html .= '<div class="criterion col-xs-6';
+        if ($criteria_score == 4) { $html .= " four selected"; }
+        $html .= '">';
+        
+        if(isset($criteria->field_significant_improve_needed['und'][0]['value'])) {
+          $html .= '<div class="descriptor"><p>'.$criteria->field_significant_improve_needed['und'][0]['value'].'</p></div>';
+        } else {
+          
+        }
+        
+        $html .= '</div></div></div>';
+        $html .= '<div class="criterion col-xs-2 last';
+        if ($criteria_score == 5) { $html .= " selected"; }
+        $html .= '">';
+        $html .= '<div class="descriptor"><p>NA</p></div></div></div>';
+        
+      } 
+    }
+    
+  }
+  
+  $html .= '<div class="row" style="margin: 0;">';
+  $html .= '  <div class="criterion criterion-label col-xs-12">';
+  $html .= '     <h4>Additional comments:</h4>';
+  //if (isset($node->{"field_".(($abbreviation == 'vfk') ? 'vfm' : $abbreviation)."_additional_comments"}['und'][0]['value'])) {
+  //  $html .= '   <p>'.$node->{"field_".(($abbreviation == 'vfk') ? 'vfm' : $abbreviation)."_additional_comments"}['und'][0]['value'].'</p>';
+  //}
+  $html .= '  </div>';
+  $html .= '</div>'; // end criteria html
+
+  //print($html);
+
+  $page_html = $rubric_header_html . $html;
+
+  return $page_html;
+}
+
+/**
+ * Implements hook_preprocess_page().
+ * 
+ * This sets a theme hook suggestion which allows the use of
+ * views-view--schedules--schedule-block.tpl.php as template
+ * file.
+ * 
+ */
+
+function internal_rubric_preprocess_page(&$vars) {
+  if (($views_page = views_get_page_view()) && $views_page->name === "rubric_evaluation_view_internal_") {
+    $vars['theme_hook_suggestions'][] = 'page__view__evaluation_internal_';
+  }
+}
+
+function internal_rubric_views_pre_render(&$view) {
+
+  if ($view->name == 'rubric_evaluation_view_internal_') {
+    
+    drupal_add_css(drupal_get_path('module', 'internal_rubric') . '/internal_rubric.css');
+    drupal_add_js(drupal_get_path('module', 'internal_rubric') . '/jquery.equalheights.min.js');
+    drupal_add_js(drupal_get_path('module', 'internal_rubric') . '/internal_rubric.js');
+
+    // get variables from view (3 set: central login, timeframe id, and response id)
+
+    $uglogin = $view->result[0]->rq_int2_uglogin;
+    $timeframe_id = $view->result[0]->rq_int2_evalue_timeframe_id;
+    $response_id = $view->result[0]->rq_int2_qualtrics_respose_id;
+
+    // get data
+
+    $result = getIntEval($response_id);
+    $sched_info = getTimeframe($result->evalue_timeframe_id);
+    $student = getStudent($result->evalue_id);
+
+    // Build Title
+    $page_title = $result->rotation.' | '.$sched_info->label.' | '.$student->fname.' '.$student->lname;
+    // Set Title
+    $view->build_info['title'] = $page_title;
+    // Build Breadcrumbs
+    $breadcrumb = array();
+    $breadcrumb[] = l('Home', '<front>');
+    $breadcrumb[] = l($student->fname.' '.$student->lname.' ('.$student->central_id.')', 'e/'.$student->central_id);
+    $breadcrumb[] = $result->rotation.' | '.$sched_info->label;
+    // Set Breadcrumbs
+    drupal_set_breadcrumb($breadcrumb);
+    
+    // set header of internal rubric
+    
+    $headertext = getInternalRubricHeader($result,$sched_info,$student);
+    
+    $header_options = array(
+      'label' => t('Header HMTL'), // Administrative label. Not really needed here.
+      'content' => $headertext, // Content of header text.
+      'format' => 'full_html', // Format of header text.
+      'empty' => 1, // Show even when there are no results. Set to zero otherwise.
+    );
+    $view->add_item('default', 'header', 'views', 'area', $header_options);
+
+    
+
+  }
+}

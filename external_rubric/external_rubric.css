@@ -1,0 +1,90 @@
+/* Rubric Criteria styling */
+
+h2.ext, h3.ext, h4.ext { font-size: 12px; font-weight: bold;}
+
+h4.ext {
+	margin-bottom: 10px;
+	margin-top: 20px;
+}
+
+div.experience { font-size: 18px; }
+
+div.week, div.supervisor, div.veterinarian, div.date, div.grade, div.comments { padding-bottom: 1.5em;}
+
+.highlight {
+	 background-color: #d9d0e3;
+}
+
+.criteria {
+	 border-top: 1px solid #D8D8D8;
+	 background-color: #FFF;
+}
+.criteria.last {
+	 border-bottom: 1px solid #D8D8D8;
+}
+
+.criteria h3.visible-xs {
+	 font-size: 1.286em;
+	 margin: 0;
+	 padding: 15px 15px 8px;
+	 border-bottom: 1px solid #212121;
+	 }
+
+.levels {
+	margin-top: 1.5em;
+	background-color: #cadcf2;
+	}
+
+.level h4 {
+	 font-size: 1.071em;
+	 font-weight: normal;
+	 margin: 0;
+	 text-align: left;
+	 padding: 1.5em 0 0 0;
+	 margin-bottom: 1.5em;
+	 text-align: center;
+	 padding-left: 1.5em;
+	 padding-right: 1.5em;
+	 }
+.level h4 span {
+	 font-weight: bold;
+	 }
+
+.criterion {
+	 border-left:   1px solid #D8D8D8;
+	 border-bottom: 1px solid #D8D8D8;
+	 border-right: none;
+	 padding: 0 15px 1.5em;
+	 }
+
+.criterion.last {
+	 border-right: 1px solid #D8D8D8;
+	 }
+	 
+.criterion {
+	 border-bottom: none;
+	 padding: 0 27px 27px;
+	 }
+.criterion .descriptor {
+	 margin-top: 1.5em;
+}
+
+
+.criteria .criterion.selected {
+	 background-color: #dff0d7;
+	 }
+
+.criteria .criterion.selected .highlight {
+	 background-color: #fcf8e2;
+}
+
+.criterion-label {
+	 padding: 27px 0 27px;
+	 /*border: 1px solid #D8D8D8;*/
+	 background-color: #fdfce8;
+}
+
+tr.clickable-row:hover {
+	cursor: pointer;
+}
+

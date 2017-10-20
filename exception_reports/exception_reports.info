@@ -1,0 +1,5 @@
+name = Exception Reports
+description = Provide necessary display code for finding missing evaluations.
+package = OVC Custom Modules
+core = 7.x
+version = "7.x-1.0"

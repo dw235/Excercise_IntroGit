@@ -1,0 +1,5 @@
+name = Prevent User Page Access
+description = Helper module to restrict the user's page access which is not necessary for this site.
+package = OVC Custom Modules
+core = 7.x
+version = "7.x-1.0"
